@@ -61,11 +61,11 @@ function setEUP(outfit)
     end
 end
 
--- Function to build/rebuild the menu
+-- Build menu function
 function buildMenu()
     mainMenu:Clear() -- Clear existing items to rebuild
 
-    -- Add static departments from config
+    -- Add static departments from config (empty if menuSetup = {})
     for _, department in pairs(config.menuSetup) do
         local departmentMenu = _menuPool:AddSubMenu(mainMenu, department.department, "", true, menuImage, menuImage)
         departmentMenu:SetMenuWidthOffset(menuWidth)
@@ -87,30 +87,14 @@ function buildMenu()
     end
 
     -- Add dynamic outfits
+    local hasOutfits = false
     for department, subMenus in pairs(dynamicOutfits) do
-        local departmentMenu = nil
-        for _, item in ipairs(mainMenu.Items) do
-            if item.Text == department then
-                departmentMenu = item
-                break
-            end
-        end
-        if not departmentMenu then
-            departmentMenu = _menuPool:AddSubMenu(mainMenu, department, "", true, menuImage, menuImage)
-            departmentMenu:SetMenuWidthOffset(menuWidth)
-        end
+        hasOutfits = true
+        local departmentMenu = _menuPool:AddSubMenu(mainMenu, department, "", true, menuImage, menuImage)
+        departmentMenu:SetMenuWidthOffset(menuWidth)
         for subMenuName, buttons in pairs(subMenus) do
-            local subMenuMenu = nil
-            for _, item in ipairs(departmentMenu.Items) do
-                if item.Text == subMenuName then
-                    subMenuMenu = item
-                    break
-                end
-            end
-            if not subMenuMenu then
-                subMenuMenu = _menuPool:AddSubMenu(departmentMenu, subMenuName, "", true, menuImage, menuImage)
-                subMenuMenu:SetMenuWidthOffset(menuWidth)
-            end
+            local subMenuMenu = _menuPool:AddSubMenu(departmentMenu, subMenuName, "", true, menuImage, menuImage)
+            subMenuMenu:SetMenuWidthOffset(menuWidth)
             for _, button in ipairs(buttons) do
                 local buttonItem = NativeUI.CreateItem(button.button, "")
                 subMenuMenu:AddItem(buttonItem)
@@ -119,6 +103,12 @@ function buildMenu()
                 end
             end
         end
+    end
+
+    -- Add placeholder if no outfits exist
+    if not hasOutfits and #config.menuSetup == 0 then
+        local placeholder = NativeUI.CreateItem("No Outfits Available", "Use /saveeup to add outfits.")
+        mainMenu:AddItem(placeholder)
     end
 
     -- Add close button
@@ -138,13 +128,13 @@ buildMenu()
 RegisterNetEvent("receiveSavedOutfits")
 AddEventHandler("receiveSavedOutfits", function(outfits)
     dynamicOutfits = outfits or {}
-    buildMenu() -- Rebuild menu with new dynamics
+    buildMenu()
 end)
 
 -- Refresh event from server
 RegisterNetEvent("refreshEUPMenu")
 AddEventHandler("refreshEUPMenu", function()
-    TriggerServerEvent("getSavedOutfits") -- Fetch latest
+    TriggerServerEvent("getSavedOutfits")
 end)
 
 function Menu()
@@ -193,22 +183,22 @@ Citizen.CreateThread(function()
     end
 end)
 
--- Function to get current EUP (shared for geteup and saveeup)
+-- Function to get current EUP
 function getCurrentEUP()
     local ped = PlayerPedId()
-    local props = "return {\n    {0, " .. (GetPedPropIndex(ped, 0) + 1) .. ", " .. GetPedPropTextureIndex(ped, 0) .. "}, -- Hats\n    {1, " .. (GetPedPropIndex(ped, 1) + 1) .. ", " .. GetPedPropTextureIndex(ped, 1) .. "}, -- Glasses\n    {6, " .. (GetPedPropIndex(ped, 6) + 1) .. ", " .. GetPedPropTextureIndex(ped, 6) .. "} -- Watch\n}"
+    local props = "return {\n    {0, " .. GetPedPropIndex(ped, 0) .. ", " .. GetPedPropTextureIndex(ped, 0) .. "}, -- Hats\n    {1, " .. GetPedPropIndex(ped, 1) .. ", " .. GetPedPropTextureIndex(ped, 1) .. "}, -- Glasses\n    {6, " .. GetPedPropIndex(ped, 6) .. ", " .. GetPedPropTextureIndex(ped, 6) .. "} -- Watch\n}"
     local components = "return {\n    {1, " .. GetPedDrawableVariation(ped, 1) .. ", " .. GetPedTextureVariation(ped, 1) .. "}, -- Mask\n    {3, " .. GetPedDrawableVariation(ped, 3) .. ", " .. GetPedTextureVariation(ped, 3) .. "}, -- Upper body\n    {4, " .. GetPedDrawableVariation(ped, 4) .. ", " .. GetPedTextureVariation(ped, 4) .. "}, -- Legs / Pants\n    {5, " .. GetPedDrawableVariation(ped, 5) .. ", " .. GetPedTextureVariation(ped, 5) .. "}, -- Bags / Parachutes\n    {6, " .. GetPedDrawableVariation(ped, 6) .. ", " .. GetPedTextureVariation(ped, 6) .. "}, -- Shoes\n    {7, " .. GetPedDrawableVariation(ped, 7) .. ", " .. GetPedTextureVariation(ped, 7) .. "}, -- Neck / Scarfs\n    {8, " .. GetPedDrawableVariation(ped, 8) .. ", " .. GetPedTextureVariation(ped, 8) .. "}, -- Shirt / Accessory\n    {9, " .. GetPedDrawableVariation(ped, 9) .. ", " .. GetPedTextureVariation(ped, 9) .. "}, -- Body Armor\n    {10, " .. GetPedDrawableVariation(ped, 10) .. ", " .. GetPedTextureVariation(ped, 10) .. "}, -- Badges / Logos\n    {11, " .. GetPedDrawableVariation(ped, 11) .. ", " .. GetPedTextureVariation(ped, 11) .. "} -- Jackets\n}"
     return props, components
 end
 
--- Original geteup command
+-- geteup command
 RegisterCommand("geteup", function(source, args, rawCommand)
     local props, components = getCurrentEUP()
     print("props = " .. props .. "\ncomponents = " .. components)
-    TriggerServerEvent("geteup", props, components) -- Matches your server event
+    TriggerServerEvent("geteup", props, components)
 end, false)
 
--- New saveeup command
+-- saveeup command
 TriggerEvent("chat:addSuggestion", "/saveeup", "Save current EUP to menu: /saveeup <department> <submenu> <button_name>")
 RegisterCommand("saveeup", function(source, args, rawCommand)
     if #args < 3 then
@@ -217,7 +207,7 @@ RegisterCommand("saveeup", function(source, args, rawCommand)
     end
     local department = args[1]
     local subMenu = args[2]
-    local buttonName = table.concat(args, " ", 3) -- Allow spaces in button name
+    local buttonName = table.concat(args, " ", 3)
     local props, components = getCurrentEUP()
     TriggerServerEvent("saveeup", department, subMenu, buttonName, props, components)
     alert("Outfit saved! Refreshing menu...")
