@@ -1,5 +1,4 @@
 ------------------------------------------------------------------------
-------------------------------------------------------------------------
 --		    Don't touch if you don't know what you're doing.		  --
 --     For support join my discord: https://discord.gg/Z9Mxu72zZ6     --
 --																	  --
@@ -35,6 +34,9 @@ _menuPool:Add(mainMenu)
 mainMenu:SetMenuWidthOffset(menuWidth)
 collectgarbage()
 
+-- Global table for dynamic outfits
+local dynamicOutfits = {}
+
 function setEUP(outfit)
     local ped = PlayerPedId()
     local model = "mp_m_freemode_01"
@@ -59,31 +61,91 @@ function setEUP(outfit)
     end
 end
 
-for _, department in pairs(config.menuSetup) do
-    local departmentMenu = _menuPool:AddSubMenu(mainMenu, department.department, "", true, menuImage, menuImage)
-    departmentMenu:SetMenuWidthOffset(menuWidth)
-    for k, subMenu in pairs(department) do
-        if k ~= "department" then
-            local subMenuMenu = _menuPool:AddSubMenu(departmentMenu, subMenu.subMenu, "", true, menuImage, menuImage)
-            subMenuMenu:SetMenuWidthOffset(menuWidth)
-            for k, button in pairs(subMenu) do
-                if k ~= "subMenu" then
-                    local buttonItem = NativeUI.CreateItem(button.button, "")
-                    subMenuMenu:AddItem(buttonItem)
-                    buttonItem.Activated = function(ParentMenu, SelectedItem)
-                        setEUP(button)
+-- Function to build/rebuild the menu
+function buildMenu()
+    mainMenu:Clear() -- Clear existing items to rebuild
+
+    -- Add static departments from config
+    for _, department in pairs(config.menuSetup) do
+        local departmentMenu = _menuPool:AddSubMenu(mainMenu, department.department, "", true, menuImage, menuImage)
+        departmentMenu:SetMenuWidthOffset(menuWidth)
+        for k, subMenu in pairs(department) do
+            if k ~= "department" then
+                local subMenuMenu = _menuPool:AddSubMenu(departmentMenu, subMenu.subMenu, "", true, menuImage, menuImage)
+                subMenuMenu:SetMenuWidthOffset(menuWidth)
+                for k, button in pairs(subMenu) do
+                    if k ~= "subMenu" then
+                        local buttonItem = NativeUI.CreateItem(button.button, "")
+                        subMenuMenu:AddItem(buttonItem)
+                        buttonItem.Activated = function(ParentMenu, SelectedItem)
+                            setEUP(button)
+                        end
                     end
                 end
             end
         end
     end
+
+    -- Add dynamic outfits
+    for department, subMenus in pairs(dynamicOutfits) do
+        local departmentMenu = nil
+        for _, item in ipairs(mainMenu.Items) do
+            if item.Text == department then
+                departmentMenu = item
+                break
+            end
+        end
+        if not departmentMenu then
+            departmentMenu = _menuPool:AddSubMenu(mainMenu, department, "", true, menuImage, menuImage)
+            departmentMenu:SetMenuWidthOffset(menuWidth)
+        end
+        for subMenuName, buttons in pairs(subMenus) do
+            local subMenuMenu = nil
+            for _, item in ipairs(departmentMenu.Items) do
+                if item.Text == subMenuName then
+                    subMenuMenu = item
+                    break
+                end
+            end
+            if not subMenuMenu then
+                subMenuMenu = _menuPool:AddSubMenu(departmentMenu, subMenuName, "", true, menuImage, menuImage)
+                subMenuMenu:SetMenuWidthOffset(menuWidth)
+            end
+            for _, button in ipairs(buttons) do
+                local buttonItem = NativeUI.CreateItem(button.button, "")
+                subMenuMenu:AddItem(buttonItem)
+                buttonItem.Activated = function(ParentMenu, SelectedItem)
+                    setEUP(button)
+                end
+            end
+        end
+    end
+
+    -- Add close button
+    local ToggleClose = NativeUI.CreateItem("Close", "Close the menu")
+    mainMenu:AddItem(ToggleClose)
+    ToggleClose.Activated = function(ParentMenu, SelectedItem)
+        _menuPool:CloseAllMenus()
+    end
+
+    _menuPool:RefreshIndex()
 end
 
-local ToggleClose = NativeUI.CreateItem("Close", "Close the menu")
-mainMenu:AddItem(ToggleClose)
-ToggleClose.Activated = function(ParentMenu, SelectedItem)
-    _menuPool:CloseAllMenus()
-end
+-- Initial build
+buildMenu()
+
+-- Receive saved outfits from server
+RegisterNetEvent("receiveSavedOutfits")
+AddEventHandler("receiveSavedOutfits", function(outfits)
+    dynamicOutfits = outfits or {}
+    buildMenu() -- Rebuild menu with new dynamics
+end)
+
+-- Refresh event from server
+RegisterNetEvent("refreshEUPMenu")
+AddEventHandler("refreshEUPMenu", function()
+    TriggerServerEvent("getSavedOutfits") -- Fetch latest
+end)
 
 function Menu()
     _menuPool:ControlDisablingEnabled(false)
@@ -108,6 +170,9 @@ if config.enableOpenCommand then
 end
 
 Citizen.CreateThread(function()
+    -- Fetch dynamic outfits on start
+    TriggerServerEvent("getSavedOutfits")
+
     while true do
         Citizen.Wait(0)
         _menuPool:ProcessMenus()
@@ -128,12 +193,34 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterCommand("geteup", function(source, args, rawCommand)
+-- Function to get current EUP (shared for geteup and saveeup)
+function getCurrentEUP()
     local ped = PlayerPedId()
-    local props = "props = {\n    {0, " .. GetPedPropIndex(ped, 0) + 1 .. ", " .. GetPedPropTextureIndex(ped, 0) .. "}, -- Hats\n    {1, " .. GetPedPropIndex(ped, 1) + 1 .. ", " .. GetPedPropTextureIndex(ped, 1) .. "}, -- Glasses\n    {6, " .. GetPedPropIndex(ped, 6) + 1 .. ", " .. GetPedPropTextureIndex(ped, 6) .. "} -- Watch\n},"
-    local components = "components = {\n    {1, " .. GetPedDrawableVariation(ped, 1) .. ", " .. GetPedTextureVariation(ped, 1) .. "}, -- Mask\n    {3, " .. GetPedDrawableVariation(ped, 3) .. ", " .. GetPedTextureVariation(ped, 3) .. "}, -- Upper body\n    {4, " .. GetPedDrawableVariation(ped, 4) .. ", " .. GetPedTextureVariation(ped, 4) .. "}, -- Legs / Pants\n    {5, " .. GetPedDrawableVariation(ped, 5) .. ", " .. GetPedTextureVariation(ped, 5) .. "}, -- Bags / Parachutes\n    {6, " .. GetPedDrawableVariation(ped, 6) .. ", " .. GetPedTextureVariation(ped, 6) .. "}, -- Shoes\n    {7, " .. GetPedDrawableVariation(ped, 7) .. ", " .. GetPedTextureVariation(ped, 7) .. "}, -- Neck / Scarfs\n    {8, " .. GetPedDrawableVariation(ped, 8) .. ", " .. GetPedTextureVariation(ped, 8) .. "}, -- Shirt / Accessory\n    {9, " .. GetPedDrawableVariation(ped, 9) .. ", " .. GetPedTextureVariation(ped, 9) .. "}, -- Body Armor\n    {10, " .. GetPedDrawableVariation(ped, 10) .. ", " .. GetPedTextureVariation(ped, 10) .. "}, -- Badges / Logos\n    {11, " .. GetPedDrawableVariation(ped, 11) .. ", " .. GetPedTextureVariation(ped, 11) .. "} -- Jackets\n},"
-    print(props .. "\n" .. components)
-    TriggerServerEvent("geteup", props, components)
+    local props = "return {\n    {0, " .. (GetPedPropIndex(ped, 0) + 1) .. ", " .. GetPedPropTextureIndex(ped, 0) .. "}, -- Hats\n    {1, " .. (GetPedPropIndex(ped, 1) + 1) .. ", " .. GetPedPropTextureIndex(ped, 1) .. "}, -- Glasses\n    {6, " .. (GetPedPropIndex(ped, 6) + 1) .. ", " .. GetPedPropTextureIndex(ped, 6) .. "} -- Watch\n}"
+    local components = "return {\n    {1, " .. GetPedDrawableVariation(ped, 1) .. ", " .. GetPedTextureVariation(ped, 1) .. "}, -- Mask\n    {3, " .. GetPedDrawableVariation(ped, 3) .. ", " .. GetPedTextureVariation(ped, 3) .. "}, -- Upper body\n    {4, " .. GetPedDrawableVariation(ped, 4) .. ", " .. GetPedTextureVariation(ped, 4) .. "}, -- Legs / Pants\n    {5, " .. GetPedDrawableVariation(ped, 5) .. ", " .. GetPedTextureVariation(ped, 5) .. "}, -- Bags / Parachutes\n    {6, " .. GetPedDrawableVariation(ped, 6) .. ", " .. GetPedTextureVariation(ped, 6) .. "}, -- Shoes\n    {7, " .. GetPedDrawableVariation(ped, 7) .. ", " .. GetPedTextureVariation(ped, 7) .. "}, -- Neck / Scarfs\n    {8, " .. GetPedDrawableVariation(ped, 8) .. ", " .. GetPedTextureVariation(ped, 8) .. "}, -- Shirt / Accessory\n    {9, " .. GetPedDrawableVariation(ped, 9) .. ", " .. GetPedTextureVariation(ped, 9) .. "}, -- Body Armor\n    {10, " .. GetPedDrawableVariation(ped, 10) .. ", " .. GetPedTextureVariation(ped, 10) .. "}, -- Badges / Logos\n    {11, " .. GetPedDrawableVariation(ped, 11) .. ", " .. GetPedTextureVariation(ped, 11) .. "} -- Jackets\n}"
+    return props, components
+end
+
+-- Original geteup command
+RegisterCommand("geteup", function(source, args, rawCommand)
+    local props, components = getCurrentEUP()
+    print("props = " .. props .. "\ncomponents = " .. components)
+    TriggerServerEvent("geteup", props, components) -- Matches your server event
+end, false)
+
+-- New saveeup command
+TriggerEvent("chat:addSuggestion", "/saveeup", "Save current EUP to menu: /saveeup <department> <submenu> <button_name>")
+RegisterCommand("saveeup", function(source, args, rawCommand)
+    if #args < 3 then
+        alert("Usage: /saveeup <department> <submenu> <button_name>")
+        return
+    end
+    local department = args[1]
+    local subMenu = args[2]
+    local buttonName = table.concat(args, " ", 3) -- Allow spaces in button name
+    local props, components = getCurrentEUP()
+    TriggerServerEvent("saveeup", department, subMenu, buttonName, props, components)
+    alert("Outfit saved! Refreshing menu...")
 end, false)
 
 print("EUP-Menu by Andyyy#7666. If you're in need of support join the discord server: https://discord.gg/Z9Mxu72zZ6")
