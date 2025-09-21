@@ -11,3 +11,8 @@ Ped presets,
 Ped components,
 LEO Loadout option,
 Accessories.
+
+COPEMAN
+New Commands
+/saveeup Police Uniforms PatrolOfficer (e.g., department = "Police", submenu = "Uniforms", button_name = "PatrolOfficer")
+/geteup
