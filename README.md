@@ -1,2 +1,0 @@
-# EUP-Menu
-eupmenu
