@@ -33,14 +33,14 @@ Navigate to a menu and select Create Sub Menu to add submenus (e.g., "Patrol").
 Save Uniforms:
 
 Select Add Uniform in the main menu.
-Enter a uniform name (e.g., "Test Uni") and a submenu path (e.g., "Police/Patrol" or just "Patrol" if unique).
+Enter a uniform name (e.g., "Patrol") and The submenu path (e.g., Police/Patrol ).
 Your current ped's clothing is saved to the specified submenu.
 
 
 Apply Uniforms:
 
 Navigate to a menu (e.g., "Police") and submenu (e.g., "Patrol").
-Select a saved uniform (e.g., "Test Uni") to apply it instantly.
+Select a saved uniform (e.g., "Patrol") to apply it instantly.
 
 
 Navigation:
@@ -67,15 +67,6 @@ Ensure RageUI and ox_lib are installed in your resources folder.
 Add to Server Config:
 
 Add ensure EUP-Menu to your server.cfg after RageUI and ox_lib.
-
-
-Set Permissions:
-
-Ensure the server has read/write permissions for the EUP-Menu folder:
-
-Linux: chmod -R 755 /path/to/fivem/resources/EUP-Menu
-Windows: Run the server as administrator.
-
 
 
 
@@ -105,6 +96,7 @@ Uniforms not saving: Verify folder permissions and check server logs for [EUP_Me
 Invalid submenu path: Ensure the entered path (e.g., "Police/Patrol") matches existing menus/submenus exactly.
 
 🌟 Contributing
-Found a bug or have a feature idea? Open an issue or submit a pull request! We welcome contributions to make EUP Menu even better.
+Found a bug or have a feature idea? Open an issue or submit a pull request! We welcome contributions to make the EUP Menu even better.
+
 
 Ready to level up your server's uniform system? Install EUP Menu and let your players create their perfect outfits! 🚓👨‍🚒
