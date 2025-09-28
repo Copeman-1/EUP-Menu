@@ -25,7 +25,7 @@ Configure up to 4 Discord roles or ACE permissions for /eup and /eupadmin.
 /eup can be open to all (none), restricted by ACE, or Discord roles.
 
 
-Dynamic Management: Admins create menus (e.g., "Police"), submenus (e.g., "Patrol"), and save uniforms to paths (e.g., "Police/Patrol").
+Dynamic Management: Admins create menus (e.g., "Police"), submenus (e.g., "Patrol"), and save uniforms to paths (saves the clothing you are wearing) (e.g., "Police/Patrol").
 Persistent Storage: Uniforms, menus, and submenus saved to outfits.json.
 Intuitive Navigation: Backspace to navigate back, ESC to exit.
 Robust Error Handling: Notifications for invalid inputs or permissions, with detailed logs.
@@ -44,7 +44,7 @@ For Admins (/eupadmin)
 Run /eupadmin (requires permission).
 Create a Menu: Add a new menu (e.g., "Fire").
 Create Sub Menu: Add a submenu (e.g., "Station" under "Fire").
-Add Uniform: Save ped’s clothing to a submenu path (e.g., "Fire/Station").
+Add Uniform: Save ped’s clothing to a submenu path (saves the clothing you are wearing) (e.g., "Fire/Station").
 Navigate and close as with the main menu.
 
 
@@ -218,6 +218,7 @@ Found a bug or have a feature idea? Open an issue or submit a pull request!
 
 
 Ready to level up your server’s uniform system? Install EUP Menu and manage outfits with ease! 🚓👨‍🚒
+
 
 
 
