@@ -33,7 +33,8 @@ client_scripts {
     '@RageUI/menu/panels/UIPercentagePanel.lua',
     '@RageUI/menu/panels/UIStatisticsPanel.lua',
     '@RageUI/menu/windows/UIHeritage.lua',
-    'client.lua'
+    'client.lua',
+	'config.lua'
 }
 
 
@@ -42,7 +43,8 @@ server_scripts {
 }
 
 shared_scripts {
-    '@ox_lib/init.lua'
+    '@ox_lib/init.lua',
+	'config.lua'
 }
 
 
