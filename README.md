@@ -81,7 +81,7 @@ Config.AdminAce = "eup.admin"
 Config.AdminDiscordRoles = {"ROLE_ID_1", "ROLE_ID_2", "", ""}
 Config.EupPermType = "discord"
 Config.EupAce = "eup.user"
-Config.EupDiscordRoles = {"ROLE_ID_3", "", "", ""}'''
+Config.EupDiscordRoles = {"ROLE_ID_3", "", "", ""}
 
 
 
@@ -206,7 +206,7 @@ Run /testdiscord in-game and check server logs.
       }
     }
   }
-}'''
+}
 
 
 📜 License
@@ -214,5 +214,6 @@ This project is licensed under the MIT License. See the LICENSE file for details
 
 🌟 Contributing
 Found a bug or have a feature idea? Open an issue or submit a pull request!
+
 
 Ready to level up your server’s uniform system? Install EUP Menu and manage outfits with ease! 🚓👨‍🚒
