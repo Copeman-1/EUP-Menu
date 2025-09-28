@@ -7,6 +7,8 @@ EUP Menu for FiveM
 Transform your server's clothing system with EUP Menu!A sleek, dual-menu system for FiveM that lets players apply custom EUP (Emergency Uniform Pack) uniforms and admins manage them effortlessly. Built with RageUI and ox_lib, this resource organizes uniforms into menus and submenus, with persistent storage in outfits.json. Supports ACE and Discord role-based permissions for flexible access control.
 
 ✨ Features
+<img width="436" height="233" alt="Screenshot 2025-09-28 174007" src="https://github.com/user-attachments/assets/c46ff7ce-0200-4b4f-b31c-e1ec76dd55a0" /> 
+<img width="439" height="302" alt="Screenshot 2025-09-28 173949" src="https://github.com/user-attachments/assets/1e5b7409-a726-4000-9923-300713ff1536" />
 
 Dual Menus:
 /eup: User menu to apply saved uniforms (permissions: ACE, Discord, or none).
@@ -211,5 +213,6 @@ Found a bug or have a feature idea? Open an issue or submit a pull request!
 
 
 Ready to level up your server’s uniform system? Install EUP Menu and manage outfits with ease! 🚓👨‍🚒
+
 
 
