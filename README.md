@@ -74,7 +74,7 @@ AdminAce/EupAce: ACE permission strings (e.g., eup.admin, eup.user).
 
 
 Example config.lua:
-'''config
+```lua
 Config = {}
 Config.BotToken = "YOUR_BOT_TOKEN"
 Config.GuildID = "YOUR_GUILD_ID"
@@ -84,9 +84,7 @@ Config.AdminDiscordRoles = {"ROLE_ID_1", "ROLE_ID_2", "", ""}
 Config.EupPermType = "discord"
 Config.EupAce = "eup.user"
 Config.EupDiscordRoles = {"ROLE_ID_3", "", "", ""}
-'''
-
-
+```
 
 
 Set Up Discord Bot (for Discord permissions):
@@ -103,25 +101,18 @@ Add IDs to Config.AdminDiscordRoles and Config.EupDiscordRoles.
 
 
 Set Up ACE Permissions (if using ACE):
-
+```config
 Add to server.cfg:add_ace group.admin eup.admin allow
 add_ace group.player eup.user allow
+```
 
 
 Example for a specific player:add_ace identifier.steam:110000123456789 eup.admin allow
 
 
-
-
 Create outfits.json:
 
 Create an empty outfits.json in the EUP-Menu folder with {}.
-
-
-Set File Permissions:
-
-Linux: chmod -R 755 /path/to/fivem/resources/EUP-Menu
-Windows: Run server as administrator.
 
 
 Restart the Server:
@@ -132,15 +123,15 @@ Run refresh and restart EUP-Menu in the server console.
 
 
 📋 Requirements
-
+```
 FiveM Server (Cerulean FX or later)
 RageUI (menu rendering)
 ox_lib (notifications and dialogs)
 Discord Bot (for Discord permissions)
-
+```
 
 🐛 Debugging
-
+```
 Client Logs: Press F8 for logs (e.g., menu navigation, permissions).
 
 Look for: [EUP_Menu] Permission granted for eup, [EUP_Menu] Opening main menu.
@@ -173,11 +164,11 @@ status: 429: Rate limit hit. Wait a few minutes or add a delay in server.lua.
 
 
 Uniforms not saving: Check folder permissions and [EUP_Menu] ERROR: Failed to save outfits.json.
+```
 
-
-Test Discord Permissions:
-
-Add a debug command to server.lua:RegisterCommand('testdiscord', function(source)
+Add a debug command to server.lua:
+```lua
+RegisterCommand('testdiscord', function(source)
     local discordID = GetDiscordID(source)
     if discordID then
         GetDiscordRoles(discordID, function(roles)
@@ -190,12 +181,11 @@ end, false)
 
 
 Run /testdiscord in-game and check server logs.
-
-
-
+```
 
 📝 Example outfits.json
-'''json {
+```json
+{
   "Police": {
     "submenus": {
       "Patrol": {
@@ -210,6 +200,7 @@ Run /testdiscord in-game and check server logs.
     }
   }
 }
+```
 
 
 📜 License
@@ -220,4 +211,5 @@ Found a bug or have a feature idea? Open an issue or submit a pull request!
 
 
 Ready to level up your server’s uniform system? Install EUP Menu and manage outfits with ease! 🚓👨‍🚒
+
 
