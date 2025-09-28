@@ -73,8 +73,10 @@ AdminDiscordRoles/EupDiscordRoles: Up to 4 Discord role IDs.
 AdminAce/EupAce: ACE permission strings (e.g., eup.admin, eup.user).
 
 
-Example config.lua:Config = {}
-'''config Config.BotToken = "YOUR_BOT_TOKEN"
+Example config.lua:
+'''config
+Config = {}
+Config.BotToken = "YOUR_BOT_TOKEN"
 Config.GuildID = "YOUR_GUILD_ID"
 Config.AdminPermType = "discord"
 Config.AdminAce = "eup.admin"
@@ -82,6 +84,7 @@ Config.AdminDiscordRoles = {"ROLE_ID_1", "ROLE_ID_2", "", ""}
 Config.EupPermType = "discord"
 Config.EupAce = "eup.user"
 Config.EupDiscordRoles = {"ROLE_ID_3", "", "", ""}
+'''
 
 
 
@@ -217,3 +220,4 @@ Found a bug or have a feature idea? Open an issue or submit a pull request!
 
 
 Ready to level up your server’s uniform system? Install EUP Menu and manage outfits with ease! 🚓👨‍🚒
+
